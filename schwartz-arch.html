@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schwartz Arch.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Neue+Haas+Grotesk+Display+Pro:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f4f0;
+    --gray: #8a8880;
+    --light-gray: #e8e7e3;
+    --accent: #c8b89a;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  #cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--white);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, background 0.3s;
+    mix-blend-mode: difference;
+  }
+  #cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1px solid rgba(245,244,240,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.12s ease-out, width 0.3s, height 0.3s;
+    mix-blend-mode: difference;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 32px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    mix-blend-mode: difference;
+  }
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .logo span { font-style: italic; }
+  .nav-links {
+    display: flex; gap: 40px; list-style: none;
+  }
+  .nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 13px;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* HERO */
+  #hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-canvas-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #hero-canvas {
+    width: 100%; height: 100%;
+    opacity: 0.5;
+  }
+  .hero-text {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(72px, 12vw, 180px);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--white);
+  }
+  .hero-title em {
+    font-style: italic;
+    font-weight: 300;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--white);
+  }
+  .hero-sub {
+    margin-top: 32px;
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gray);
+    font-weight: 300;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .scroll-indicator {
+    position: absolute;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .scroll-indicator span {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gray);
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .scroll-line {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, var(--gray), transparent);
+    animation: scrollpulse 2s infinite;
+  }
+  @keyframes scrollpulse {
+    0%,100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  /* SECTION BASE */
+  section { position: relative; }
+
+  /* MANIFESTO */
+  #manifesto {
+    min-height: 100vh;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    padding: 120px 8vw;
+    overflow: hidden;
+  }
+  .manifesto-inner {
+    max-width: 900px;
+  }
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 48px;
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .manifesto-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4vw, 64px);
+    font-weight: 300;
+    line-height: 1.25;
+    color: var(--black);
+  }
+  .manifesto-text em {
+    font-style: italic;
+    color: var(--gray);
+  }
+  .manifesto-detail {
+    margin-top: 56px;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #555;
+    max-width: 520px;
+    border-left: 1px solid var(--light-gray);
+    padding-left: 32px;
+  }
+
+  /* 3D CUBE SECTION */
+  #cube-section {
+    min-height: 100vh;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 120px 8vw;
+    overflow: hidden;
+    position: relative;
+  }
+  .cube-text {
+    max-width: 480px;
+    z-index: 2;
+  }
+  .cube-text h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 5vw, 80px);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 32px;
+  }
+  .cube-text p {
+    font-size: 16px;
+    line-height: 1.9;
+    color: var(--gray);
+    margin-bottom: 48px;
+  }
+  .btn-outline {
+    display: inline-block;
+    padding: 16px 40px;
+    border: 1px solid rgba(245,244,240,0.3);
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Cormorant Garamond', serif;
+    transition: background 0.4s, color 0.4s, border-color 0.4s;
+  }
+  .btn-outline:hover {
+    background: var(--white);
+    color: var(--black);
+    border-color: var(--white);
+  }
+  #cube-canvas-wrap {
+    flex: 0 0 500px;
+    height: 500px;
+    position: relative;
+  }
+  #cube-canvas {
+    width: 100%; height: 100%;
+  }
+
+  /* PROJECTS */
+  #projects {
+    background: var(--black);
+    padding: 80px 0 160px;
+  }
+  .projects-header {
+    padding: 0 8vw;
+    margin-bottom: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .projects-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 6vw, 96px);
+    font-weight: 300;
+    line-height: 1;
+  }
+  .projects-header h2 em {
+    font-style: italic;
+    -webkit-text-stroke: 1px var(--white);
+    color: transparent;
+  }
+  .projects-count {
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: var(--gray);
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .project-card {
+    position: relative;
+    overflow: hidden;
+    background: #111;
+    aspect-ratio: 4/3;
+    cursor: pointer;
+  }
+  .project-card:first-child { grid-column: span 2; aspect-ratio: 16/7; }
+  .project-visual {
+    width: 100%; height: 100%;
+    transition: transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .project-card:hover .project-visual { transform: scale(1.04); }
+  .project-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 40px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    transform: translateY(20px);
+    transition: transform 0.5s;
+  }
+  .project-card:hover .project-info { transform: translateY(0); }
+  .project-num {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gray);
+    font-family: 'Cormorant Garamond', serif;
+    margin-bottom: 8px;
+  }
+  .project-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(20px, 2.5vw, 36px);
+    font-weight: 300;
+    margin-bottom: 6px;
+  }
+  .project-type {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  /* ROTATING TEXT + SPHERE */
+  #sphere-section {
+    min-height: 100vh;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #sphere-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+  }
+  .sphere-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    mix-blend-mode: multiply;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 80px;
+    text-align: center;
+  }
+  .stat-item .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(56px, 8vw, 120px);
+    font-weight: 300;
+    color: var(--black);
+    line-height: 1;
+    display: block;
+  }
+  .stat-item em {
+    font-style: italic;
+    font-size: 0.6em;
+    vertical-align: super;
+  }
+  .stat-item .label {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gray);
+    display: block;
+    margin-top: 12px;
+  }
+
+  /* TEAM */
+  #team {
+    background: var(--black);
+    padding: 160px 8vw;
+    position: relative;
+  }
+  .team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 80px;
+  }
+  .team-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 6vw, 96px);
+    font-weight: 300;
+    line-height: 1;
+  }
+  .team-header p {
+    max-width: 320px;
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--gray);
+    padding-top: 16px;
+  }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .team-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .team-portrait {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: #1a1a1a;
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .portrait-canvas {
+    width: 100%; height: 100%;
+  }
+  .team-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 300;
+    margin-bottom: 4px;
+  }
+  .team-role {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--gray);
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  /* CONTACT / FOOTER */
+  #contact {
+    min-height: 80vh;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 8vw;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #contact-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    opacity: 0.12;
+  }
+  .contact-inner { position: relative; z-index: 2; }
+  .contact-tag {
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 40px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .contact-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 7vw, 120px);
+    font-weight: 300;
+    color: var(--black);
+    line-height: 1;
+    margin-bottom: 56px;
+  }
+  .contact-headline em { font-style: italic; color: var(--gray); }
+  .contact-links {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 80px;
+  }
+  .contact-link {
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    color: var(--black);
+    text-decoration: none;
+    border-bottom: 1px solid var(--black);
+    padding-bottom: 4px;
+    transition: opacity 0.3s;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+  .contact-link:hover { opacity: 0.5; }
+
+  footer {
+    background: var(--black);
+    padding: 40px 8vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #1a1a1a;
+  }
+  footer p { font-size: 12px; color: var(--gray); letter-spacing: 0.1em; font-family: 'Cormorant Garamond', serif; }
+
+  /* Scroll-triggered fade */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a href="#" class="logo">Schwartz <span>Arch.</span></a>
+  <ul class="nav-links">
+    <li><a href="#projects">Projekte</a></li>
+    <li><a href="#manifesto">Philosophie</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#contact">Kontakt</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-canvas-wrap">
+    <canvas id="hero-canvas"></canvas>
+  </div>
+  <div class="hero-text">
+    <h1 class="hero-title fade-up">
+      Schwartz<br><em>Arch.</em>
+    </h1>
+    <p class="hero-sub fade-up">Architektur · Raum · Identität</p>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section id="manifesto">
+  <div class="manifesto-inner">
+    <span class="section-tag fade-up">01 — Philosophie</span>
+    <p class="manifesto-text fade-up">
+      Architektur ist <em>gefrorene Musik</em> —<br>
+      jede Linie erzählt eine Geschichte,<br>
+      jeder Raum atmet Leben.
+    </p>
+    <p class="manifesto-detail fade-up">
+      Wir bei Schwartz Arch. glauben, dass großartige Architektur aus dem Dialog zwischen Mensch und Raum entsteht. Unsere Entwürfe sind Antworten auf Fragen, die noch nicht gestellt wurden — präzise, zeitlos und zutiefst menschlich.
+    </p>
+  </div>
+</section>
+
+<!-- CUBE / APPROACH -->
+<section id="cube-section">
+  <div class="cube-text fade-up">
+    <span class="section-tag" style="color:var(--gray)">02 — Ansatz</span>
+    <h2>Form folgt<br><em style="font-style:italic">Empfindung</em></h2>
+    <p>Jedes Projekt beginnt mit einer Frage: Was soll dieser Ort fühlen lassen? Wir entwickeln Konzepte, die Funktion und Ästhetik in vollständige Einheit bringen.</p>
+    <a href="#projects" class="btn-outline">Projekte entdecken</a>
+  </div>
+  <div id="cube-canvas-wrap">
+    <canvas id="cube-canvas"></canvas>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="projects-header fade-up">
+    <h2>Aus<br><em>gewählte</em><br>Projekte</h2>
+    <span class="projects-count">03 — Portfolio</span>
+  </div>
+  <div class="projects-grid">
+    <div class="project-card fade-up">
+      <canvas class="project-visual" id="proj1"></canvas>
+      <div class="project-info">
+        <p class="project-num">001</p>
+        <h3 class="project-title">Villa am Wienerwald</h3>
+        <span class="project-type">Wohnbau · Wien, 2024</span>
+      </div>
+    </div>
+    <div class="project-card fade-up">
+      <canvas class="project-visual" id="proj2"></canvas>
+      <div class="project-info">
+        <p class="project-num">002</p>
+        <h3 class="project-title">Kulturzentrum Graz</h3>
+        <span class="project-type">Öffentlich · Graz, 2023</span>
+      </div>
+    </div>
+    <div class="project-card fade-up">
+      <canvas class="project-visual" id="proj3"></canvas>
+      <div class="project-info">
+        <p class="project-num">003</p>
+        <h3 class="project-title">Büroturm Nord</h3>
+        <span class="project-type">Gewerbe · Linz, 2022</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPHERE STATS -->
+<section id="sphere-section">
+  <canvas id="sphere-canvas"></canvas>
+  <div class="sphere-content">
+    <div class="stat-grid fade-up">
+      <div class="stat-item">
+        <span class="num">24<em>+</em></span>
+        <span class="label">Jahre Erfahrung</span>
+      </div>
+      <div class="stat-item">
+        <span class="num">180</span>
+        <span class="label">Realisierte Projekte</span>
+      </div>
+      <div class="stat-item">
+        <span class="num">12<em>×</em></span>
+        <span class="label">Ausgezeichnet</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="team-header">
+    <h2 class="fade-up">Das<br>Team</h2>
+    <p class="fade-up">Menschen mit Leidenschaft für Raum, Licht und die Stille zwischen den Dingen.</p>
+  </div>
+  <div class="team-grid">
+    <div class="team-card fade-up">
+      <div class="team-portrait">
+        <canvas class="portrait-canvas" id="portrait1"></canvas>
+      </div>
+      <h3 class="team-name">Elisabeth Schwartz</h3>
+      <span class="team-role">Gründerin & Chefarchitektin</span>
+    </div>
+    <div class="team-card fade-up">
+      <div class="team-portrait">
+        <canvas class="portrait-canvas" id="portrait2"></canvas>
+      </div>
+      <h3 class="team-name">Markus Vogel</h3>
+      <span class="team-role">Partner, Städtebau</span>
+    </div>
+    <div class="team-card fade-up">
+      <div class="team-portrait">
+        <canvas class="portrait-canvas" id="portrait3"></canvas>
+      </div>
+      <h3 class="team-name">Nina Holzer</h3>
+      <span class="team-role">Innenarchitektur</span>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <canvas id="contact-canvas"></canvas>
+  <div class="contact-inner">
+    <p class="contact-tag fade-up">05 — Kontakt</p>
+    <h2 class="contact-headline fade-up">Lassen Sie uns<br><em>sprechen</em></h2>
+    <div class="contact-links fade-up">
+      <a href="mailto:studio@schwartz-arch.at" class="contact-link">studio@schwartz-arch.at</a>
+      <a href="tel:+431234567" class="contact-link">+43 1 234 567</a>
+      <a href="#" class="contact-link">Ringstraße 42, Wien</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Schwartz Arch. — Wien, Österreich</p>
+  <p>Architektur ist Haltung</p>
+</footer>
+
+<script>
+// ─── CURSOR ───────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx+'px'; cursor.style.top = my+'px';
+});
+function animRing() {
+  rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+  ring.style.left = rx+'px'; ring.style.top = ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+// ─── SCROLL REVEAL ────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+// ─── HERO CANVAS: Floating lines ──────────────────────────
+const heroC = document.getElementById('hero-canvas');
+const hCtx = heroC.getContext('2d');
+let heroLines = [];
+function resizeHero() {
+  heroC.width = heroC.offsetWidth;
+  heroC.height = heroC.offsetHeight;
+}
+resizeHero();
+window.addEventListener('resize', resizeHero);
+for (let i=0; i<30; i++) {
+  heroLines.push({
+    x: Math.random()*100, y: Math.random()*100,
+    vx: (Math.random()-0.5)*0.015, vy: (Math.random()-0.5)*0.015,
+    len: 60+Math.random()*140, angle: Math.random()*Math.PI
+  });
+}
+let scrollY = 0;
+window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+function drawHero() {
+  heroC.width = heroC.offsetWidth; // reset to clear
+  heroC.height = heroC.offsetHeight;
+  const w = heroC.width, h = heroC.height;
+  const drift = scrollY * 0.0008;
+  heroLines.forEach(l => {
+    l.x += l.vx; l.y += l.vy;
+    if (l.x<0) l.x=100; if (l.x>100) l.x=0;
+    if (l.y<0) l.y=100; if (l.y>100) l.y=0;
+    l.angle += 0.002;
+    const cx = l.x/100*w, cy = l.y/100*h;
+    const ex = Math.cos(l.angle+drift)*l.len, ey = Math.sin(l.angle+drift)*l.len;
+    const grad = hCtx.createLinearGradient(cx-ex/2,cy-ey/2,cx+ex/2,cy+ey/2);
+    grad.addColorStop(0,'rgba(245,244,240,0)');
+    grad.addColorStop(0.5,'rgba(245,244,240,0.25)');
+    grad.addColorStop(1,'rgba(245,244,240,0)');
+    hCtx.strokeStyle = grad;
+    hCtx.lineWidth = 0.5;
+    hCtx.beginPath();
+    hCtx.moveTo(cx-ex/2, cy-ey/2);
+    hCtx.lineTo(cx+ex/2, cy+ey/2);
+    hCtx.stroke();
+  });
+  requestAnimationFrame(drawHero);
+}
+drawHero();
+
+// ─── CUBE CANVAS: Wireframe rotating cube ─────────────────
+const cubeC = document.getElementById('cube-canvas');
+const cCtx = cubeC.getContext('2d');
+function resizeCube() { cubeC.width = cubeC.offsetWidth; cubeC.height = cubeC.offsetHeight; }
+resizeCube();
+window.addEventListener('resize', resizeCube);
+
+let cubeAngle = 0;
+function project3D(x,y,z,fov,cx,cy) {
+  const f = fov/(fov+z);
+  return { x: x*f+cx, y: y*f+cy };
+}
+function drawCube() {
+  const w = cubeC.width, h = cubeC.height;
+  cCtx.clearRect(0,0,w,h);
+  const scrollFactor = Math.max(0, (scrollY-500)/400);
+  cubeAngle += 0.008 + scrollFactor*0.01;
+  const s = Math.min(w,h)*0.32;
+  const pts = [
+    [-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],
+    [-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]
+  ].map(([x,y,z]) => {
+    // rotate Y
+    const rx = x*Math.cos(cubeAngle) - z*Math.sin(cubeAngle);
+    const rz = x*Math.sin(cubeAngle) + z*Math.cos(cubeAngle);
+    // rotate X slightly
+    const ang2 = cubeAngle*0.4;
+    const ry2 = y*Math.cos(ang2) - rz*Math.sin(ang2);
+    const rz2 = y*Math.sin(ang2) + rz*Math.cos(ang2);
+    return project3D(rx*s, ry2*s, rz2*s+300, 500, w/2, h/2);
+  });
+  const edges = [
+    [0,1],[1,2],[2,3],[3,0],
+    [4,5],[5,6],[6,7],[7,4],
+    [0,4],[1,5],[2,6],[3,7]
+  ];
+  cCtx.strokeStyle = 'rgba(245,244,240,0.8)';
+  cCtx.lineWidth = 1;
+  edges.forEach(([a,b]) => {
+    cCtx.beginPath();
+    cCtx.moveTo(pts[a].x, pts[a].y);
+    cCtx.lineTo(pts[b].x, pts[b].y);
+    cCtx.stroke();
+  });
+  // inner cross lines
+  cCtx.strokeStyle = 'rgba(245,244,240,0.15)';
+  cCtx.lineWidth = 0.5;
+  [[0,6],[1,7],[2,4],[3,5]].forEach(([a,b]) => {
+    cCtx.beginPath();
+    cCtx.moveTo(pts[a].x, pts[a].y);
+    cCtx.lineTo(pts[b].x, pts[b].y);
+    cCtx.stroke();
+  });
+  requestAnimationFrame(drawCube);
+}
+drawCube();
+
+// ─── PROJECT CANVASES: Architectural line drawings ─────────
+function drawArchitectural(canvas, seed, colorA, colorB) {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const rng = (n) => Math.abs(Math.sin(seed*n+n)*10000)%1;
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0,0,w,h);
+  // grid of architectural lines
+  ctx.strokeStyle = colorA;
+  ctx.lineWidth = 0.5;
+  const cols = 8+Math.floor(rng(1)*6);
+  for (let i=0;i<=cols;i++) {
+    const x = (i/cols)*w;
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+  }
+  const rows = 6+Math.floor(rng(2)*4);
+  for (let i=0;i<=rows;i++) {
+    const y = (i/rows)*h;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+  // Bold architectural form
+  ctx.strokeStyle = colorB;
+  ctx.lineWidth = 2;
+  const bx = w*0.1, by = h*0.15, bw = w*0.8, bh = h*0.6;
+  ctx.strokeRect(bx, by+h*0.1, bw, bh);
+  // windows
+  ctx.lineWidth = 0.8;
+  ctx.strokeStyle = 'rgba(200,184,154,0.5)';
+  const winRows = 3, winCols = 5;
+  const ww = (bw*0.7)/winCols, wh = (bh*0.4)/winRows;
+  for (let r=0;r<winRows;r++) for (let c=0;c<winCols;c++) {
+    ctx.strokeRect(bx+bw*0.15+c*(ww+12), by+h*0.1+bh*0.15+r*(wh+12), ww, wh);
+  }
+  // Ground line
+  ctx.strokeStyle = colorB; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0, by+h*0.1+bh+2); ctx.lineTo(w, by+h*0.1+bh+2); ctx.stroke();
+  // diagonal accent
+  ctx.lineWidth = 0.3; ctx.strokeStyle = 'rgba(245,244,240,0.05)';
+  for (let i=-h; i<w+h; i+=30) {
+    ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i+h,h); ctx.stroke();
+  }
+}
+
+function initProjects() {
+  const p1 = document.getElementById('proj1');
+  const p2 = document.getElementById('proj2');
+  const p3 = document.getElementById('proj3');
+  if(p1) { p1.width=p1.offsetWidth; p1.height=p1.offsetHeight; drawArchitectural(p1,1,'rgba(255,255,255,0.06)','rgba(255,255,255,0.7)'); }
+  if(p2) { p2.width=p2.offsetWidth; p2.height=p2.offsetHeight; drawArchitectural(p2,7,'rgba(255,255,255,0.04)','rgba(200,184,154,0.8)'); }
+  if(p3) { p3.width=p3.offsetWidth; p3.height=p3.offsetHeight; drawArchitectural(p3,13,'rgba(255,255,255,0.05)','rgba(255,255,255,0.6)'); }
+}
+window.addEventListener('load', initProjects);
+setTimeout(initProjects, 300);
+
+// ─── SPHERE CANVAS: Particle sphere ───────────────────────
+const sphereC = document.getElementById('sphere-canvas');
+const sCtx = sphereC.getContext('2d');
+function resizeSphere() { sphereC.width = sphereC.offsetWidth; sphereC.height = sphereC.offsetHeight; }
+resizeSphere();
+window.addEventListener('resize', resizeSphere);
+let sphereAngle = 0;
+function drawSphere() {
+  const w = sphereC.width, h = sphereC.height;
+  sCtx.clearRect(0,0,w,h);
+  const sectionTop = document.getElementById('sphere-section').offsetTop;
+  const rel = (scrollY - sectionTop + window.innerHeight) / (window.innerHeight*2);
+  sphereAngle = rel * Math.PI * 2;
+  const R = Math.min(w,h)*0.35;
+  const cx = w/2, cy = h/2;
+  const n = 600;
+  sCtx.fillStyle = 'rgba(10,10,10,0.9)';
+  sCtx.fillRect(0,0,w,h);
+  for (let i=0;i<n;i++) {
+    const phi = Math.acos(1-2*(i+0.5)/n);
+    const theta = Math.PI*(1+Math.sqrt(5))*(i+0.5) + sphereAngle;
+    const x3 = Math.sin(phi)*Math.cos(theta);
+    const y3 = Math.sin(phi)*Math.sin(theta);
+    const z3 = Math.cos(phi);
+    // simple rotation
+    const rx2 = x3*Math.cos(sphereAngle*0.3)-z3*Math.sin(sphereAngle*0.3);
+    const rz2 = x3*Math.sin(sphereAngle*0.3)+z3*Math.cos(sphereAngle*0.3);
+    const px = cx + rx2*R;
+    const py = cy + y3*R;
+    const brightness = (rz2+1)/2;
+    const size = brightness*2.5+0.3;
+    sCtx.beginPath();
+    sCtx.arc(px,py,size,0,Math.PI*2);
+    sCtx.fillStyle = `rgba(245,244,240,${brightness*0.8})`;
+    sCtx.fill();
+  }
+  requestAnimationFrame(drawSphere);
+}
+drawSphere();
+
+// ─── PORTRAIT CANVASES: Abstract faces ───────────────────
+function drawPortrait(canvas, hue) {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.fillStyle = '#111'; ctx.fillRect(0,0,w,h);
+  // Abstract geometric portrait
+  ctx.strokeStyle = 'rgba(245,244,240,0.15)'; ctx.lineWidth = 0.5;
+  for (let i=0;i<20;i++) {
+    ctx.beginPath(); ctx.moveTo(0,i*h/20); ctx.lineTo(w,i*h/20); ctx.stroke();
+  }
+  // Head oval
+  ctx.strokeStyle = 'rgba(245,244,240,0.7)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(w/2, h*0.38, w*0.25, h*0.3, 0,0,Math.PI*2); ctx.stroke();
+  // Eyes
+  ctx.fillStyle = 'rgba(245,244,240,0.9)';
+  ctx.beginPath(); ctx.arc(w*0.38, h*0.32, w*0.035, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.62, h*0.32, w*0.035, 0, Math.PI*2); ctx.fill();
+  // Diagonal texture
+  ctx.strokeStyle = 'rgba(200,184,154,0.2)'; ctx.lineWidth = 0.5;
+  for (let i=-h; i<w+h; i+=16) {
+    ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i+h,h); ctx.stroke();
+  }
+  // Name underline area
+  ctx.fillStyle = 'rgba(245,244,240,0.04)';
+  ctx.fillRect(0, h*0.75, w, h*0.25);
+}
+setTimeout(() => {
+  const pcanvases = document.querySelectorAll('.portrait-canvas');
+  const hues = [0, 30, 60];
+  pcanvases.forEach((c,i) => drawPortrait(c, hues[i]));
+}, 400);
+
+// ─── CONTACT CANVAS: Rotating grid ────────────────────────
+const contactC = document.getElementById('contact-canvas');
+const ccCtx = contactC.getContext('2d');
+function resizeContact() { contactC.width = contactC.offsetWidth; contactC.height = contactC.offsetHeight; }
+resizeContact();
+window.addEventListener('resize', resizeContact);
+let contactAngle = 0;
+function drawContact() {
+  const w = contactC.width, h = contactC.height;
+  ccCtx.clearRect(0,0,w,h);
+  contactAngle += 0.003;
+  const cx = w/2, cy = h/2;
+  const size = Math.min(w,h)*0.8;
+  ccCtx.save();
+  ccCtx.translate(cx,cy);
+  ccCtx.rotate(contactAngle);
+  const steps = 10;
+  ccCtx.strokeStyle = '#0a0a0a';
+  ccCtx.lineWidth = 0.8;
+  for (let i=1;i<=steps;i++) {
+    const s = (size/steps)*i;
+    ccCtx.strokeRect(-s/2,-s/2,s,s);
+  }
+  for (let i=-steps;i<=steps;i++) {
+    ccCtx.beginPath(); ccCtx.moveTo(i*(size/(steps*2)), -size/2);
+    ccCtx.lineTo(i*(size/(steps*2)), size/2); ccCtx.stroke();
+    ccCtx.beginPath(); ccCtx.moveTo(-size/2, i*(size/(steps*2)));
+    ccCtx.lineTo(size/2, i*(size/(steps*2))); ccCtx.stroke();
+  }
+  ccCtx.restore();
+  requestAnimationFrame(drawContact);
+}
+drawContact();
+</script>
+</body>
+</html>
